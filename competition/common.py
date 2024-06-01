@@ -12,7 +12,8 @@ HeaderType = Tuple[HuffmanTable, float]  # using the example jpeg encoder
 
 # a constant shared by the encoder and decoder
 jpeg_quant_size = 128
-jpeg2000_quant_size = 18.03030303030303
-n_level = 4
+jpegdwt_quant_size = 19.16161616161616161616
+n = 4
+
 def my_function():
     pass
