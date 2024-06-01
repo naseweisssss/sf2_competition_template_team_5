@@ -1,7 +1,9 @@
 """ This file contains the `decode` function. Feel free to split it into smaller functions """
 import numpy as np
 from cued_sf2_lab.jpeg import jpegdec
-from .common import my_function, HeaderType, jpeg_quant_size
+
+from jpeg_dwt import jpeg2000dec
+from common import my_function, HeaderType, jpeg_quant_size, jpeg2000_quant_size, n_level
 
 def decode(vlc: np.ndarray, header: HeaderType) -> np.ndarray:
     """
@@ -13,4 +15,8 @@ def decode(vlc: np.ndarray, header: HeaderType) -> np.ndarray:
         header: any additional parameters to be saved alongside the image
     """
     # replace this with your chosen decoding scheme
-    return jpegdec(vlc, jpeg_quant_size, hufftab=header, log=False)
+
+    hufftab, min_step = header
+    Z =  jpeg2000dec(vlc, n_level, min_step, hufftab=hufftab, quantisation_scheme= 1, dcbits=8)
+    Z += 128.0
+    return Z
