@@ -10,7 +10,6 @@ from scipy.optimize import fsolve, minimize
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 X1, _ = load_mat_img('images/lighthouse.mat', img_info='X')
 X2, _ = load_mat_img('images/bridge.mat', img_info='X')
 X3, _ = load_mat_img('images/flamingo.mat', img_info='X')

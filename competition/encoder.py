@@ -3,12 +3,15 @@ import numpy as np
 from typing import Tuple, Any
 from cued_sf2_lab.jpeg import jpegenc
 from jpeg_dwt import jpeg2000enc
-from common import HeaderType, jpeg_quant_size, jpeg2000_quant_size, n_level
+# from common import HeaderType, jpeg_quant_size, jpeg2000_quant_size, n_level
 from scipy.optimize import fsolve, minimize
+from cued_sf2_lab.jpeg import HuffmanTable
+HeaderType = Tuple[HuffmanTable, float]
+
 
 
 n_level = 4
-jpeg2000_quant_size = 18.03030303030303
+jpeg2000_quant_size = 19.2
 def header_bits(header: HeaderType) -> int:
     """ Estimate the number of bits in your header.
     

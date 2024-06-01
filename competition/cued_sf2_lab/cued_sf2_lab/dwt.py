@@ -3,13 +3,15 @@ import numpy as np
 
 from .laplacian_pyramid import rowdec, rowdec2, rowint, rowint2
 
-__all__ = ["h1", "h2", "g1", "g2", "dwt", "idwt"]
+_all_ = ["h1", "h2", "g1", "g2", "dwt", "idwt"]
 
-h1 = np.array([-1, 2, 6, 2, -1])/8
-h2 = np.array([-1, 2, -1])/4
+h1 = np.array([0.00680328, 0.03551957, 0.13707027, 0.25, 0.13707027, 0.03551957, 0.00680328])
+h2 = np.array([-1, 2, 6, 2, -1])/8
+# h2 = np.array([-1, 2, -1])/4
 
-g1 = np.array([1, 2, 1])/2
-g2 = np.array([-1, -2, 6, -2, -1])/4
+# g1 = np.array([1, 2, 1])/2
+g1 = np.array([-1, -2, 6, -2, -1])/4
+g2 = np.array([-0.00680328, -0.03551957, -0.13707027, -0.25, -0.13707027, -0.03551957, -0.00680328])
 
 
 def dwt(X: np.ndarray, h1: np.ndarray = h1, h2: np.ndarray = h2) -> np.ndarray:
