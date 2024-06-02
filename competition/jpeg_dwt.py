@@ -1,12 +1,9 @@
-from cProfile import label
 import numpy as np
-import matplotlib.pyplot as plt
-from typing import Tuple, NamedTuple, Optional
-from cued_sf2_lab.dct import colxfm, dct_ii, regroup
+from typing import Tuple, Optional
 from cued_sf2_lab.dwt import dwt, idwt
 from cued_sf2_lab.laplacian_pyramid import quant1, quant2, quantise, bpp
 from cued_sf2_lab.jpeg import diagscan, runampl, huffdes, huffenc, huffgen, huffdflt, dwtgroup, HuffmanTable
-from cued_sf2_lab.familiarisation import load_mat_img, plot_image
+from cued_sf2_lab.familiarisation import load_mat_img
 
 def nlevdwt(X, n):
     m = X.shape[0]
@@ -108,7 +105,7 @@ def frequency_dependent_quantisation(n):
 
     return dwt_ratios
 
-def jpeg2000enc(X: np.ndarray, n: float, qstep: float, quantisation_scheme: int, dcbits: int = 8,
+def jpegdwtenc(X: np.ndarray, n: float, qstep: float, quantisation_scheme: int, dcbits: int = 8,
         opthuff: bool = False, log: bool = False
         ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     '''
@@ -164,20 +161,6 @@ def jpeg2000enc(X: np.ndarray, n: float, qstep: float, quantisation_scheme: int,
     sy = Yq.shape
     huffhist = np.zeros(16 ** 2)
     vlc = []
-    # dcbits = 0
-    # for r in range(0, sy[0], N):
-    #     for c in range(0, sy[1], N):
-    #         yr = Yr[r:r+N,c:c+N]
-    #         # Possibly regroup
-    #         yrflat = yr.flatten('F')
-    #         # Encode DC coefficient first
-    #         top_left = yrflat[0]
-    #         if top_left ==0:
-    #             continue
-    #         if np.log2(np.abs(top_left)) == int(np.log2(np.abs(top_left))):
-    #             dcbits = max(dcbits, int(np.ceil(np.log2(np.abs(top_left)) + 2)))
-    #         else:
-    #             dcbits = max(dcbits, int(np.ceil(np.log2(np.abs(top_left)) + 1)))
 
     for r in range(0, sy[0], N):
         for c in range(0, sy[1], N):
@@ -239,7 +222,7 @@ def jpeg2000enc(X: np.ndarray, n: float, qstep: float, quantisation_scheme: int,
 
     return vlc, dhufftab
 
-def jpeg2000dec(vlc: np.ndarray, n: int, qstep: float, quantisation_scheme: int, dcbits: int = 8,
+def jpegdwtdec(vlc: np.ndarray, n: int, qstep: float, quantisation_scheme: int, dcbits: int = 8,
         hufftab: Optional[HuffmanTable] = None, 
         W: int = 256, H: int = 256, log: bool = False
         ) -> np.ndarray:
@@ -370,38 +353,38 @@ def jpeg2000dec(vlc: np.ndarray, n: int, qstep: float, quantisation_scheme: int,
     return Z
 
 
-if __name__ == "__main__":
-    # load in the image
-    from cued_sf2_lab.familiarisation import load_mat_img, plot_image
+# if __name__ == "__main__":
+#     # load in the image
+#     from cued_sf2_lab.familiarisation import load_mat_img, plot_image
 
-    X1, _ = load_mat_img('lighthouse.mat', img_info='X')
-    X2, _ = load_mat_img('bridge.mat', img_info='X')
-    X3, _ = load_mat_img('flamingo.mat', img_info='X')
-    X4, _ = load_mat_img('SF2_competition_image_2019.mat', img_info='X')
-    X5, _ = load_mat_img('SF2_competition_image_2020.mat', img_info='X')
-    X6, _ = load_mat_img('SF2_competition_image_2021.mat', img_info='X')
-    X7, _ = load_mat_img('SF2_Competition_Image2022.mat', img_info='X')
+#     X1, _ = load_mat_img('lighthouse.mat', img_info='X')
+#     X2, _ = load_mat_img('bridge.mat', img_info='X')
+#     X3, _ = load_mat_img('flamingo.mat', img_info='X')
+#     X4, _ = load_mat_img('SF2_competition_image_2019.mat', img_info='X')
+#     X5, _ = load_mat_img('SF2_competition_image_2020.mat', img_info='X')
+#     X6, _ = load_mat_img('SF2_competition_image_2021.mat', img_info='X')
+#     X7, _ = load_mat_img('SF2_Competition_Image2022.mat', img_info='X')
 
 
-    images = [X1, X2, X3, X4, X5, X6, X7]
-    image_dec = []
+#     images = [X1, X2, X3, X4, X5, X6, X7]
+#     image_dec = []
 
-    for i in range(len(images)):
-        X = images[i]
-        print(i)
-        vlc, hufftab = encode(X)
-        Z = decode(vlc, hufftab)
-        image_dec.append(Z)
+#     for i in range(len(images)):
+#         X = images[i]
+#         print(i)
+#         vlc, hufftab = encode(X)
+#         Z = decode(vlc, hufftab)
+#         image_dec.append(Z)
 
-    n = 4
-    suffecient_step = 1
-    ref = bpp(quantise(X, 17))*X.size
+#     n = 4
+#     suffecient_step = 1
+#     ref = bpp(quantise(X, 17))*X.size
 
-    vlc_suff, huff_suff = jpeg2000enc(X, n, suffecient_step, opthuff= True, quantisation_scheme=1)
-    Z_suff = jpeg2000dec(vlc_suff, n, suffecient_step, hufftab=huff_suff, quantisation_scheme=1)
-    compression_ratio_mse = ref/(sum(vlc_suff[:, 1]) + 1424)
-    print("suffecient mse step: {}".format(suffecient_step))
+#     vlc_suff, huff_suff = jpegdwtenc(X, n, suffecient_step, opthuff= True, quantisation_scheme=1)
+#     Z_suff = jpegdwtdec(vlc_suff, n, suffecient_step, hufftab=huff_suff, quantisation_scheme=1)
+#     compression_ratio_mse = ref/(sum(vlc_suff[:, 1]) + 1424)
+#     print("suffecient mse step: {}".format(suffecient_step))
 
-    print("No. of bits for mse: {}".format(sum(vlc_suff[:, 1]) + 1424))
-    print("RMS error for mse: {}".format(np.std(X - Z_suff)))
-    print("Compression ratios for mse: {}".format(compression_ratio_mse))
+#     print("No. of bits for mse: {}".format(sum(vlc_suff[:, 1]) + 1424))
+#     print("RMS error for mse: {}".format(np.std(X - Z_suff)))
+#     print("Compression ratios for mse: {}".format(compression_ratio_mse))
